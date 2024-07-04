@@ -1,16 +1,11 @@
-import React,{useState} from 'react'
-import { Outlet,Navigate } from 'react-router-dom'
+import React from 'react'
+import { Outlet } from 'react-router-dom'
 
 
 const AuthLayout = () => {
 
-const [Authenticated, setAuthenticated] = useState(false)
-
   return (
     <>
-      {Authenticated ? (
-        <Navigate to="/profile" />
-      ) : (
         <div className='flex'>
         <img 
           src="/assets/landing.jpg" 
@@ -20,9 +15,7 @@ const [Authenticated, setAuthenticated] = useState(false)
         <section className='flex flex-1 justify-center items-center flex-col'>
           <Outlet />
         </section>
-          
-
-        </div>)}
+        </div>
     </>
   )
 }

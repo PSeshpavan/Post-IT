@@ -1,34 +1,40 @@
-import React, { useState } from 'react';
-import validator from 'validator';
-import { BiLoaderCircle } from 'react-icons/bi'; 
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { BiLoaderCircle } from 'react-icons/bi';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+
+import { AuthContext } from '../../context/uisAuthenticated';
 
 const LoginForm = () => {
-  const [identifier, setIdentifier] = useState(''); 
+  const [username, setUsername] = useState(''); 
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
+  
+
+  const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
 
   const validateField = (fieldName, value) => {
     switch (fieldName) {
-      case 'identifier':
+      case 'username':
         if (!value) {
-          return 'Username or Email is required.';
+          return 'Username is required.';
         }
-        return validator.isEmail(value) || value.length >= 3 ? '' : 'Enter a valid email or username.';
+        return value.length >= 3 ? '' : 'Username must be at least 3 characters long.';
       case 'password':
-        return value.length >= 8 ? '' : 'Must be at least 8 characters.';
+        return value.length >= 8 ? '' : 'Password must be at least 8 characters long.';
       default:
         return '';
     }
   };
 
-
   const handleInputChange = (fieldName, value) => {
     switch (fieldName) {
-      case 'identifier':
-        setIdentifier(value);
+      case 'username':
+        setUsername(value);
         break;
       case 'password':
         setPassword(value);
@@ -37,26 +43,32 @@ const LoginForm = () => {
         break;
     }
 
-
     const error = validateField(fieldName, value);
     setErrors((prevErrors) => ({ ...prevErrors, [fieldName]: error }));
   };
-
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const validationErrors = validateForm();
     if (Object.values(validationErrors).every((error) => error === '')) {
-      
       setIsLoading(true);
       try {
-        
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        console.log('Form is valid, proceed with submission.');
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        await axios.post('http://localhost:3000/api/login', { username, password })
+        .then((res) => {
+          Cookies.set('token', res.data.jwt_token);
+          Cookies.set('userId', res.data.id);
+          axios.defaults.headers.common['Authorization'] = res.data.jwt_token;
+          login();
+          navigate("/");
+        })
+        .catch((err) => {
+          console.log(err.response.data);
+        });
       } catch (error) {
-        console.error('Error during form submission', error);
-      } finally {
+        console.error('Error during form submission', error.response.data);
+      } 
+      finally {
         setIsLoading(false);
       }
     } else {
@@ -64,14 +76,10 @@ const LoginForm = () => {
     }
   };
 
-
   const validateForm = () => {
     const newErrors = {};
-
-
-    newErrors.identifier = validateField('identifier', identifier);
+    newErrors.username = validateField('username', username);
     newErrors.password = validateField('password', password);
-
     return newErrors;
   };
 
@@ -80,18 +88,18 @@ const LoginForm = () => {
       <h1 className='text-5xl mb-6'>Welcome Back</h1>
       <form onSubmit={handleSubmit} className='flex flex-col'>
         <div className="Form-Field mb-4 relative">
-          <label htmlFor="identifier">Username</label>
+          <label htmlFor="username">Username</label>
           <input
             className='appearance-none border rounded w-full py-2 px-3 text-grey-darker'
             type="text"
-            name="identifier"
-            id="identifier"
-            placeholder='Enter your username or email'
-            value={identifier}
-            onChange={(e) => handleInputChange('identifier', e.target.value)}
-            onBlur={() => setErrors((prevErrors) => ({ ...prevErrors, identifier: validateField('identifier', identifier) }))}
+            name="username"
+            id="username"
+            placeholder='Enter your username'
+            value={username}
+            onChange={(e) => handleInputChange('username', e.target.value)}
+            onBlur={() => setErrors((prevErrors) => ({ ...prevErrors, username: validateField('username', username) }))}
           />
-          {errors.identifier && <p className="text-red-500 absolute -top-[3px] right-0 mt-1">{errors.identifier}</p>}
+          {errors.username && <p className="text-red-500 absolute -top-[3px] right-0 mt-1">{errors.username}</p>}
         </div>
         <div className="Form-Field mb-4 relative">
           <label htmlFor="password">Password</label>
@@ -117,7 +125,7 @@ const LoginForm = () => {
       </form>
       <div className="text-center">
         <p>Don't have an account? <Link to="/signup" className="text-blue-500">Signup</Link></p>
-        </div>
+      </div>
     </div>
   );
 };

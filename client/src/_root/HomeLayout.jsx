@@ -1,10 +1,25 @@
 import React from 'react'
-import { Button } from "@/components/ui/button"
+import { Outlet } from 'react-router-dom'
+import Navbar from '../components/Navbar'
+import Sidebar from '../components/Sidebar'
+import Footer from '../components/Footer'
 
 const HomeLayout = () => {
     return (
-        <>HomeLayout
-        <Button> HELLO THERE </Button>
+        <>
+            <Navbar />
+            <section className="">
+                <Sidebar />
+            </section>
+
+            <section>
+                <Outlet />
+            </section>
+
+            <section className="">
+                <Footer />
+            </section>
+            
         </>
     )
 }

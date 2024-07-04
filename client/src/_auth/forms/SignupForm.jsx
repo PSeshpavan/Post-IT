@@ -2,9 +2,13 @@ import React, { useState } from 'react';
 import validator from 'validator';
 import { AiOutlineInfoCircle } from 'react-icons/ai'; 
 import { BiLoaderCircle } from 'react-icons/bi';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const SignupForm = () => {
+  const navigate = useNavigate();
+
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -71,7 +75,6 @@ const SignupForm = () => {
         break;
     }
 
-    // Validate the field and update errors state
     const error = validateField(fieldName, value);
     setErrors((prevErrors) => ({ ...prevErrors, [fieldName]: error }));
   };
@@ -113,12 +116,18 @@ const SignupForm = () => {
     if (Object.values(validationErrors).every((error) => error === '')) {
       setIsLoading(true);
       try {
-        // Simulate an API call
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        console.log('Form is valid, proceed with submission.');
-        // Handle successful signup logic here
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        await axios.post('http://localhost:3000/api/register', { name, email, username, password })
+            .then((res) => {
+              console.log(res.data);
+              navigate('/login');
+            })
+            .catch((err) => {
+              console.log(err.response.data);
+            });
+        
       } catch (error) {
-        console.error('Error during form submission', error);
+        console.error('Error during form submission', error.response.data);
       } finally {
         setIsLoading(false);
       }
