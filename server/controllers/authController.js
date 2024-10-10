@@ -1,19 +1,17 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import passport from 'passport';
+// import jwt from 'jsonwebtoken';
+// import passport from 'passport';
 
 import User from '../models/user-model.js';
 // { create, find, findOneAndUpdate, findOneAndDelete }
 import generateToken from '../utils/generateToken.js';
-import e from 'express';
 
 
 export async function registerUser(req, res) {
     try {
         const { name, email, username, password } = req.body;
 
-        // Check if user already exists
-        const userExists = await User.findOne({ email });
+        const userExists = await User.findOne({ username });
         if (userExists) return res.send("User already exists");
 
         bcrypt.genSalt(10, (err, salt) => {
@@ -26,9 +24,9 @@ export async function registerUser(req, res) {
                         username,
                         password: hash,
                     })
-                    // res.send(user);
-                    let token = generateToken(user);
-                    res.cookie("token", token).send("User Registered Successfully");
+                    res
+                    .status(201)
+                    .send("User Registered Successfully");
                 }
             })
         })
@@ -52,13 +50,14 @@ export async function loginUser(req, res) {
             }
             if (result) {
                 let token = generateToken(user);
-                const { password, ...userWithoutPassword } = user.toObject();
+                // const { password, ...userWithoutPassword } = user.toObject();
                 res
-                .cookie("token", token )
+                .cookie("token", token,{ httpOnly: true, secure: true, sameSite: 'strict' })
                 .status(200)
                 .json({
                     jwt_token:token,
-                    id:userWithoutPassword._id,
+                    // id:userWithoutPassword._id,
+                    id:user._id,
                 })
             } else {
                 return res

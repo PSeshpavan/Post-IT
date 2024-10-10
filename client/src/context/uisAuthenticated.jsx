@@ -1,27 +1,17 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [userData, setUserData] = useState(null); // Set initial state to null to differentiate between uninitialized and empty data
+    const [isLoading, setIsLoading] = useState(true);
 
-    const login = () => {
-        setIsAuthenticated(true);
-    };
+    const hasCookie = () => Cookies.get('token') !== undefined;
 
-    const logout = () => {
-        setIsAuthenticated(false);
-    };
-
-    const hasCookie = () => {
-        if(Cookies.get('token') !== undefined) {
-            return true;
-        }
-    }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout, hasCookie }}>
+        <AuthContext.Provider value={{ hasCookie, userData, setUserData, isLoading,setIsLoading }}>
             {children}
         </AuthContext.Provider>
     );

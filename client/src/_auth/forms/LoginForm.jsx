@@ -14,7 +14,7 @@ const LoginForm = () => {
   
 
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  // const { login } = useContext(AuthContext);
 
 
   const validateField = (fieldName, value) => {
@@ -58,9 +58,10 @@ const LoginForm = () => {
         .then((res) => {
           Cookies.set('token', res.data.jwt_token);
           Cookies.set('userId', res.data.id);
-          axios.defaults.headers.common['Authorization'] = res.data.jwt_token;
-          login();
-          navigate("/");
+          // axios.defaults.headers.common['authorization'] = res.data.jwt_token; 
+          // login();
+          console.log('Login successful');
+          navigate("/home");
         })
         .catch((err) => {
           console.log(err.response.data);

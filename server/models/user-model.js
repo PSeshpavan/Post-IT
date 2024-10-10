@@ -9,14 +9,22 @@ const userSchema = new Schema({
         type: Array,
         default: []
     },
+    friendRequests: [
+        {
+            senderId: { type: Schema.Types.ObjectId, ref: 'User' },
+            createdAt: { type: Date, default: Date.now }
+        }
+    ],
     friends: {
         type: Array,
         default: []
     },
-    MyStories: {
-        type: Array,
-        default: []
-    },
+
+    // UPDATE!: MAY OR MAYNOT ADD
+    // MyStories: {
+    //     type: Array,
+    //     default: []
+    // },
     UserDP: String,
 });
 

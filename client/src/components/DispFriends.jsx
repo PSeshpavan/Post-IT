@@ -24,7 +24,7 @@ const DispFriends = () => {
   //   fetchFriends();
   // }, [friends]);
   return (
-    <div className="friends-sidebar fixed right-0 top-0 h-full w-1/4 bg-gray-200 p-4">
+    <div className="friends-sidebar ">
     <h2 className="text-2xl font-semibold mb-4">Friends</h2>
     <ul>
       {dynamicFriends.map((friend) => (

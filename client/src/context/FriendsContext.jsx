@@ -1,11 +1,10 @@
-// FriendsContext.js
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 export const FriendsContext = createContext();
 
 export const FriendsProvider = ({ children }) => {
-    const [friends, setFriends] = useState([]); // Ensure initial state is an empty array
+    const [friends, setFriends] = useState([]); 
 
     useEffect(() => {
         fetchFriends();
@@ -14,7 +13,7 @@ export const FriendsProvider = ({ children }) => {
     const fetchFriends = async () => {
         try {
             const response = await axios.get('/api/friends');
-            setFriends(response.data); // Ensure response.data is an array
+            setFriends(response.data);
         } catch (error) {
             console.error('Error fetching friends:', error);
         }
@@ -23,9 +22,13 @@ export const FriendsProvider = ({ children }) => {
     const addFriend = async (newFriend) => {
         try {
             const response = await axios.post('/api/friends', newFriend);
+            if (response.status !== 200) {
+                throw new Error('Failed to add friend');
+            }
             setFriends((prevFriends) => [...prevFriends, response.data]);
         } catch (error) {
             console.error('Error adding friend:', error);
+            throw error;
         }
     };
 
